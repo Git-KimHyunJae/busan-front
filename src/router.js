@@ -1,9 +1,9 @@
-import { createMemoryHistory, createRouter } from "vue-router";
-import BusanSafeMap from "@/components/BusanSafeMap.vue";
+import { createMemoryHistory, createRouter } from 'vue-router'
+import BusanSafeMap from '@/components/BusanSafeMap.vue'
 
-const routes = [{ path: "/", component: BusanSafeMap }];
+const routes = [{ path: '/', component: BusanSafeMap }]
 
 export const router = createRouter({
   history: createMemoryHistory(),
   routes,
-});
+})

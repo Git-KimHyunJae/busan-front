@@ -1,16 +1,16 @@
-import axios from "axios";
+import axios from 'axios'
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
   timeout: 10_000,
-  headers: { "Content-Type": "application/json" },
-});
+  headers: { 'Content-Type': 'application/json' },
+})
 
 client.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+  const token = localStorage.getItem('token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
 
 client.interceptors.response.use(
   (res) => res,
@@ -18,8 +18,8 @@ client.interceptors.response.use(
     if (error.response?.status === 401) {
       // 토큰 만료 처리
     }
-    return Promise.reject(error);
+    return Promise.reject(error)
   },
-);
+)
 
-export default client;
+export default client
