@@ -9,6 +9,7 @@
             width="30vw"
             class="flex-grow-0"
           ></v-text-field>
+          <v-btn @click="apiTest"> 테스트 </v-btn>
         </div>
       </v-app-bar-title>
     </v-app-bar>
@@ -32,6 +33,7 @@
 
 <script setup>
   import { onMounted, onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
+  import client from '@/api/request'
 
   const mapContainer = ref(null)
   const map = shallowRef(null)
@@ -85,6 +87,12 @@
     //pointLocation.y = longitude;
     console.log('현재 위치는 : ' + latitude + ', ' + longitude)
   })
+
+  const apiTest = () => {
+    client.get('/location/getLocation').then((res) => {
+      console.log('완료?')
+    })
+  }
 </script>
 
 <style>

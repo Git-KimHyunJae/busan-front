@@ -1,23 +1,29 @@
 import axios from 'axios'
+import { useLoadingStore } from '../store/loading'
 
 const client = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
-  timeout: 10_000,
+  timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 })
 
+//api 요청 시작할때 실행되는 코드
 client.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
+  useLoadingStore().startLoading()
   return config
+  // const token = localStorage.getItem('token')
+  // if (token) config.headers.Authorization = `Bearer ${token}`
+  // return config
 })
 
+//api 응답이 왔을때 실행 되는 코드
 client.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    useLoadingStore().endLoading()
+    return res
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      // 토큰 만료 처리
-    }
+    useLoadingStore().endLoading()
     return Promise.reject(error)
   },
 )
