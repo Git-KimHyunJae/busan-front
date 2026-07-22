@@ -32,6 +32,7 @@
   const mapContainer = ref(null)
   const map = shallowRef(null)
 
+  //최초 실행시 좌표(부산시청)
   const pointLocation = {
     x: 35.17972847528216,
     y: 129.07506760221816,
@@ -54,6 +55,7 @@
     }
   })
 
+  //클릭한곳 주위 좌표조회
   const clickHandler = (mouseEvent) => {
     getClickLocation(mouseEvent)
   }
@@ -103,7 +105,6 @@
   }
 
   navigator.geolocation.getCurrentPosition(function (pos) {
-    console.log(pos)
     let latitude = pos.coords.latitude
     //pointLocation.x = latitude;
     let longitude = pos.coords.longitude
@@ -122,10 +123,18 @@
     console.log('message', message)
     try {
       const res = await getLocation(pointLocation)
-      console.log('res', res)
-    } catch (err) {
-      console.log('err', err)
-    }
+      //조회한 데이터가 존재하면
+      if (res.data.length > 0) {
+        //위치마다 마커객체 생성해서 맵에 붙여줌
+        res.data.forEach((location) => {
+          var markerPosition = new kakao.maps.LatLng(location.latitude, location.longitude)
+          var marker = new kakao.maps.Marker({
+            position: markerPosition,
+          })
+          marker.setMap(map.value)
+        })
+      }
+    } catch (err) {}
   }
 </script>
 
