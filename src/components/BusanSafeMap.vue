@@ -4,6 +4,8 @@
       <v-app-bar-title>
         <div class="d-flex">
           <div class="mainText mr-3">부산 안전 지도</div>
+          <v-autocomplete label="반경" :items="radius" item-title="TXT" item-value="COD">
+          </v-autocomplete>
         </div>
       </v-app-bar-title>
     </v-app-bar>
@@ -13,10 +15,6 @@
         <div class="mr-2">소방서</div>
         <div class="mr-2">CCTV</div>
         <div class="mr-2">비상벨</div>
-        <!-- <Button class="mx-2" text="경찰서" color="FFFFFF"></Button>
-        <Button class="mx-2" text="소방서"></Button>
-        <Button class="mx-2" text="CCTV"></Button>
-        <Button class="mx-2" text="비상벨"></Button> -->
       </div>
       <v-divider></v-divider>
       <div>주변 안전시설 N곳</div>
@@ -31,6 +29,11 @@
 
   const mapContainer = ref(null)
   const map = shallowRef(null)
+  const radius = reactive([
+    { TXT: '50M', COD: 50 },
+    { TXT: '100M', COD: 100 },
+  ])
+  let markers = []
 
   //최초 실행시 좌표(부산시청)
   const pointLocation = {
@@ -58,6 +61,13 @@
   //클릭한곳 주위 좌표조회
   const clickHandler = (mouseEvent) => {
     getClickLocation(mouseEvent)
+  }
+
+  //기존에 표시된 마커들을 지도에서 제거
+  const clearMarkers = () => {
+    markers.forEach((marker) => {
+      marker.setMap(null)
+    })
   }
 
   const initMap = () => {
@@ -106,10 +116,8 @@
 
   navigator.geolocation.getCurrentPosition(function (pos) {
     let latitude = pos.coords.latitude
-    //pointLocation.x = latitude;
     let longitude = pos.coords.longitude
-    //pointLocation.y = longitude;
-    console.log('현재 위치는 : ' + latitude + ', ' + longitude)
+    //console.log('현재 위치는 : ' + latitude + ', ' + longitude)
   })
 
   //클릭한 좌표 주위에 있는 정보들을 조회한다.
@@ -118,23 +126,32 @@
 
     pointLocation.latitude = latlng.getLat() //위도(가로)
     pointLocation.longitude = latlng.getLng() //경도(세로)
+    let markerPosition = null
+    let marker = null
 
-    const message = `클릭한 위치의 위도는 ${pointLocation.x} 이고, 경도는 ${pointLocation.y} 입니다`
-    console.log('message', message)
+    //const message = `클릭한 위치의 위도는 ${pointLocation.x} 이고, 경도는 ${pointLocation.y} 입니다`
+    //console.log('message', message)
+
     try {
       const res = await getLocation(pointLocation)
+      clearMarkers()
       //조회한 데이터가 존재하면
-      if (res.data.length > 0) {
+      if (res.data.length > 0 && res.data) {
         //위치마다 마커객체 생성해서 맵에 붙여줌
         res.data.forEach((location) => {
-          var markerPosition = new kakao.maps.LatLng(location.latitude, location.longitude)
-          var marker = new kakao.maps.Marker({
+          markerPosition = new kakao.maps.LatLng(location.latitude, location.longitude)
+          marker = new kakao.maps.Marker({
             position: markerPosition,
           })
           marker.setMap(map.value)
+          markers.push(marker)
         })
+      } else {
+        marker.setMap(null)
       }
-    } catch (err) {}
+    } catch (err) {
+      clearMarkers()
+    }
   }
 </script>
 
